@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interactive Branch Cuts</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+	  
+  <script src="math.js"></script>
+  <script type="application/javascript">  
+		var canvasR;
+		var canvasL;
+		var ctxL;
+		var ctxR;
+		const CanvasScale = 2.5;
+			
+		var offsetX=0
+			offsetY=0;
+		var Dragging=false;
+		var xStart=0
+			yStart=0;
+		var xBall=3
+			yBall=0;
+		var Ball = new Circle(xBall, yBall, 0.15, "black", "black");
+		var focused = false;
+		var isMouseDown = false;
+		var mousePosition;
+		
+		var THETASTART =0;
+		var DELTATHETA = Math.PI;
+		
+		
+		//Variables for coordinate transform
+		var MagnificationLHS=1/50;
+		var xCenterLHS=0
+			yCenterLHS=0;
+			
+		var MagnificationRHS=1/50;
+		var xCenterRHS=0
+			yCenterRHS=0;
+			
+		var CanvasWidthLHS=0
+			CanvasWidthRHS=0 
+			CanvasHeightLHS=0
+			CanvasHeightRHS=0;
+		
+	    function init() {	
+			canvasR = document.getElementById('RHS');
+			canvasL = document.getElementById('LHS');
+			
+			
+			ctxL = canvasL.getContext('2d');
+			ctxR = canvasR.getContext('2d');		
+			canvasR.onmousedown = mDown;
+			canvasR.onmouseup = mUp;
+			canvasR.onmousemove = mMove;
+			
+			var BBR = canvasR.getBoundingClientRect(); 
+			offsetX = BBR.left; 
+			offsetY = BBR.top;
+			CanvasWidthRHS = BBR.width;
+			CanvasHeightRHS = BBR.height;
+			
+			var BBL = canvasL.getBoundingClientRect(); 
+			offsetX = BBL.left; 
+			offsetY = BBL.top;
+			CanvasWidthLHS = canvasL.width;
+			CanvasHeightLHS = canvasL.height;
+				
+			var CWL=CanvasWidthLHS*CanvasScale;
+			canvasL.style.width=CWL.toString().concat("px");
+			
+			draw();				
+		}
+		
+		// handle mouse events
+		function mMove(e) {
+			if (isMouseDown) {
+				getMousePosition(e);
+				//if any circle is focused
+				var mGrid=ScreenToGridRHS(mousePosition.x, mousePosition.y);
+				if (focused) {
+					Ball.x = mGrid.x;
+					Ball.y = mGrid.y;
+					//computes new angle;
+					THETASTART=Math.atan2(Ball.y, Ball.x);
+					draw();
+					return;
+				}
+				//no circle currently focused check if circle is hovered
+				var dx = mGrid.x - Ball.x;
+				var dy = mGrid.y - Ball.y;
+				var intersects = (dx * dx + dy *dy) <= (Ball.r * Ball.r);
+				
+				if (intersects) {
+					focused = true;
+				}
+				draw();
+			}else{
+				//do nothing
+			}
+		}
+		
+		//set mousedown state
+		function mDown(e) {
+			isMouseDown = true;
+		}
+		function mUp(e) {		
+			isMouseDown = false;
+			focused=false;
+		}
+		
+		function getMousePosition(e) {
+			var rect = canvasR.getBoundingClientRect();
+			mousePosition = {
+				x: Math.round(e.x - rect.left),
+				y: Math.round(e.y - rect.top)
+			}
+		}
+
+		
+		// coordinate transformation
+		function ScreenToGridLHS(xs, ys){
+			//Converts pixel coordinates into grid coordinates
+			var xg=(xs-CanvasWidthLHS/2)*MagnificationLHS + xCenterLHS;
+			var yg=(ys-CanvasHeightLHS/2)*(-MagnificationLHS) + yCenterLHS;
+			var coord =new Object();
+			coord.x=xg;
+			coord.y=yg;
+			return coord;
+		}
+		function ScreenToGridRHS(xs, ys){
+			//Converts pixel coordinates into grid coordinates
+			var xg=(xs-CanvasWidthRHS/2)*MagnificationRHS + xCenterRHS;
+			var yg=(ys-CanvasHeightRHS/2)*(-MagnificationRHS) + yCenterRHS;
+			var coord =new Object();
+			coord.x=xg;
+			coord.y=yg;
+			return coord;
+		}
+		function GridToScreenLHS(xg, yg){
+			//Converts grid coordinates into pixel coordinates
+			var xs=(xg - xCenterLHS)/MagnificationLHS + CanvasWidthLHS/2;
+			var ys=(yg - yCenterLHS)/(-MagnificationLHS) + CanvasHeightLHS/2;
+			var coord = new Object();
+			coord.x=xs;
+			coord.y=ys;
+			return coord;
+		}
+		function GridToScreenRHS(xg, yg){
+			//Converts grid coordinates into pixel coordinates
+			var xs=(xg - xCenterRHS)/MagnificationRHS + CanvasWidthRHS/2;
+			var ys=(yg - yCenterRHS)/(-MagnificationRHS) + CanvasHeightRHS/2;
+			var coord = new Object();	
+			coord.x=xs;
+			coord.y=ys;
+			return coord;
+		}
+		
+		
+		
+		//circle Object
+		function Circle(x, y, r, fill, stroke) {
+			this.startingAngle = 0;
+			this.endAngle = 2 * Math.PI;
+			this.x = x;
+			this.y = y;
+			this.r = r;
+
+			this.fill = fill;
+			this.stroke = stroke;
+
+			this.draw = function () {
+				var xys=GridToScreenRHS(this.x, this.y);
+				ctxR.beginPath();
+				ctxR.arc(xys.x, xys.y, this.r/MagnificationRHS, this.startingAngle, this.endAngle);
+				ctxR.fillStyle = this.fill;
+				ctxR.lineWidth = 3;
+				ctxR.fill();
+				ctxR.strokeStyle = this.stroke;
+				ctxR.stroke();
+			}
+		}
+	    
+		//Drawing functions
+		function updateDTheta(){
+			//Updates deltatheta then draws
+			
+			plotZplane(canvasL, ctxL, true);
+			draw();
+		}
+		function draw() {	
+			//clear canvas
+			ctxL.clearRect(0, 0, CanvasWidthLHS, CanvasHeightLHS);
+			ctxR.clearRect(0, 0, CanvasWidthRHS, CanvasHeightRHS);
+			
+			THETASTART=Math.atan2(Ball.y, Ball.x);
+			
+			//Updates the right canvas
+			plotAngle(canvasR, ctxR);
+			drawAxesRHS();
+			drawBranchLinesRHS();
+			Ball.draw();
+			
+			//Updates the left canvas
+			plotZplane(canvasL, ctxL, false);
+			drawAxesLHS();			
+		}
+		function drawAxesLHS(){
+			//Draws the axis lines
+			ctxL.lineWidth = 0.5;
+			ctxL.beginPath();
+			ctxL.moveTo(0, CanvasHeightLHS/2);
+			ctxL.lineTo(CanvasWidthLHS, CanvasHeightLHS/2);
+			ctxL.moveTo(CanvasWidthLHS/2, 0);
+			ctxL.lineTo(CanvasWidthLHS/2, CanvasHeightLHS);
+			ctxL.stroke();	
+		}
+		
+		function drawAxesRHS(){
+			//Draws the axis lines
+			ctxR.lineWidth = 3;
+			ctxR.beginPath();
+			ctxR.moveTo(0, CanvasHeightRHS/2);
+			ctxR.lineTo(CanvasWidthRHS, CanvasHeightRHS/2);
+			ctxR.moveTo(CanvasWidthRHS/2, 0);
+			ctxR.lineTo(CanvasWidthRHS/2, CanvasHeightRHS);
+			ctxR.stroke();
+		}
+		function drawBranchLinesRHS(){
+			//Draws the branch lines after moving the ball
+			
+			//Solid line at the branch start
+			ctxR.lineWidth = 5;
+			ctxR.strokeStyle = "#FFFFFF";
+			ctxR.beginPath();
+			var xy = GridToScreenRHS(0,0);
+			ctxR.moveTo(xy.x, xy.y);
+			var maxW = CanvasWidthRHS*MagnificationRHS/2;
+			var maxH = CanvasHeightRHS*MagnificationRHS/2;
+			var maxR = Math.sqrt(maxH * maxH + maxH * maxH);
+			
+			xy = GridToScreenRHS(maxR*Math.cos(THETASTART), maxR*Math.sin(THETASTART));
+			ctxR.lineTo(xy.x, xy.y);
+			ctxR.stroke();
+				
+			
+			
+			//Dashed line on the opposite side of the plane
+			ctxR.setLineDash([8]);
+			var xy = GridToScreenRHS(0,0);
+			ctxR.moveTo(xy.x, xy.y);
+			xy = GridToScreenRHS(maxR*Math.cos(THETASTART+DELTATHETA), maxR*Math.sin(THETASTART+DELTATHETA));
+			ctxR.lineTo(xy.x, xy.y);
+			ctxR.stroke();
+			ctxR.setLineDash([]);
+			
+			
+			
+			
+		}
+		function plotAngle(Canvas, Context){
+			//This function plots the complex angle of the complex number array 
+			
+			var width = Canvas.width,
+				height = Canvas.height,
+				Buffer = new Uint8ClampedArray(width * height * 4); // have enough bytes
+				
+			for(var y = 0; y < height; y++) {
+				for(var x = 0; x < width; x++) {
+					var pos = (y * width + x) * 4; // position in buffer based on x and y
+					var xy = ScreenToGridRHS(x,y);
+					var theta=Math.atan2(xy.y,xy.x);
+					var alpha = 255;
+					if (theta<THETASTART){
+						theta=theta+2*Math.PI;
+					}
+					
+					if (theta>(THETASTART+DELTATHETA)){
+						alpha=80;
+					}
+					
+					//var H = (theta+Math.PI)/(2*Math.PI);
+					var H = theta/(2*Math.PI) + 0.5;
+					var rgb=HSVtoRGB(H, 1, 1);
+					
+					Buffer[pos] = rgb.r;           // some R value [0, 255]
+					Buffer[pos+1] = rgb.g;           // some G value
+					Buffer[pos+2] = rgb.b;           // some B value
+					Buffer[pos+3] = alpha;           // set alpha channel
+				}
+			}
+			
+			plotImage(Context, width, height, Buffer)
+		}	
+
+		function plotZplane(Canvas, Context, calcDeltaTheta){
+			//Plots the f(z) function angle in the z plane
+			var currentString = math.parse(document.getElementById("fz").value);
+			var currentExpression = currentString.compile();
+			var scope=new Object();			
+			var F_of_Z;
+			var theta;
+			var width = Canvas.width,
+				height = Canvas.height,
+				Buffer = new Uint8ClampedArray(width * height * 4); // have enough bytes
+				
+			var minTheta = +1e6
+				maxTheta = -1e6;
+				
+			for(var y = 0; y < height; y++) {
+				for(var x = 0; x < width; x++) {
+					var pos = (y * width + x) * 4; // position in buffer based on x and y
+					var xy = ScreenToGridRHS(x*CanvasScale,y*CanvasScale);
+										
+					scope.z=math.complex(xy.x,xy.y);
+					F_of_Z=currentExpression.evaluate(scope);
+									
+					
+					var Polar = F_of_Z.toPolar();
+					theta = Polar.phi;
+					
+					if (calcDeltaTheta){
+						//Updates DELTATHETA
+						if (theta<minTheta) {
+							minTheta=theta;
+						}
+						if (theta>maxTheta) {
+							maxTheta=theta;
+						}
+					} else {
+						//Just uses DELTATHETA
+						if (theta<THETASTART){
+							theta=theta+DELTATHETA;
+							if (theta<THETASTART){
+								theta=theta+DELTATHETA;
+							}
+						}else if (theta>(THETASTART + DELTATHETA)){
+							theta=theta-DELTATHETA;
+						}
+					}
+					
+					
+					var H = theta/(2*Math.PI) + 0.5;
+					var rgb=HSVtoRGB(H, 1, 1);
+					
+					Buffer[pos] = rgb.r;           // some R value [0, 255]
+					Buffer[pos+1] = rgb.g;           // some G value
+					Buffer[pos+2] = rgb.b;           // some B value
+					Buffer[pos+3] = 255;           // set alpha channel
+				}
+			}
+			
+			if (calcDeltaTheta){
+				var dTheta = (maxTheta - minTheta);
+				if (dTheta<(2*Math.PI)){
+					DELTATHETA=dTheta;
+				}
+			} else {
+				plotImage(Context, width, height, Buffer);	
+			}
+			
+		}					
+		
+		function plotImage(Context, W, H, Buffer){
+			// This function plots the image in the buffer.		
+				var idata = Context.createImageData(W, H);
+
+				// set our buffer as source
+				idata.data.set(Buffer);
+
+				// update canvas with new data
+				Context.putImageData(idata, 0, 0);
+		}
+		
+		
+		//Colormap 
+		function HSVtoRGB(h, s, v) {
+			var r, g, b, i, f, p, q, t;
+			i = Math.floor(h * 6);
+			f = h * 6 - i;
+			p = v * (1 - s);
+			q = v * (1 - f * s);
+			t = v * (1 - (1 - f) * s);
+			switch (i % 6) {
+				case 0: r = v, g = t, b = p; break;
+				case 1: r = q, g = v, b = p; break;
+				case 2: r = p, g = v, b = t; break;
+				case 3: r = p, g = q, b = v; break;
+				case 4: r = t, g = p, b = v; break;
+				case 5: r = v, g = p, b = q; break;
+			}
+			return {
+				r: Math.round(r * 255),
+				g: Math.round(g * 255),
+				b: Math.round(b * 255)
+			};
+		}
+		
+	</script>
+	<style type="text/css">
+      canvas { border: 1px solid black; }
+		th {
+		  text-align: center;
+		}
+		td {
+		  text-align: center;
+		}
+    </style>
+	  
+	  
+  </head>
+  <body onload="init();">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Menu</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="http:\\zigunov.com">Back to zigunov.com <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Other Projects</a>
+          </li>
+          <li class="nav-item dropdown"> </li>
+        </ul>
+</div>
+    </nav>
+    <section> 
+	  <div style="clear: left;"></div>    
+		<div style="clear: left;"></div>
+		<h2>Interactive Branch Cuts of Complex Functions</h2>
+        <h6>Drag the black ball on the right plot to rotate the branch cut. Type a function of the variable "z" on the text box. </h6>
+  <div align="center">
+	  f(z)=<input type="text" id="fz" name="fz" value="sqrt(z)" onchange="updateDTheta();"><br><br>
+	
+
+<table style="width:100%">
+  <tr>
+    <th>z plane colored by arg[f(z)]</th>
+    <th>f(z) plane colored by arg[f(z)]</th>
+  </tr>
+  <tr>
+    <td><canvas id="LHS" width="240px" height="240px" align="absmiddle"></canvas></td>
+    <td><canvas id="RHS" width="600px" height="600px" align="absmiddle"></canvas></td>
+  </tr>
+</table>
+	  
+	 </section>
+    
+    <footer class="text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <p>Copyright © Fernando Zigunov 2020. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap-4.4.1.js"></script>
+  </body>
+</html>
