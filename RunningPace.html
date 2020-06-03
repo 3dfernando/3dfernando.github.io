@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interactive Branch Cuts</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+	  
+  <script type="application/javascript">  
+		var minmi;
+		var minkm;
+		var kmh;
+		var mih;
+		function init(){			
+			document.getElementById("minkm").value="6:25";
+			UpdateMinKm();			
+		}
+		
+		function UpdateMinKm(){
+			minkm=parseMinSec(document.getElementById("minkm").value);
+			CalculateMinKm();
+			updateTextBoxes();
+			clearStyles();
+			
+			var txt=document.getElementById("minkm");
+			txt.style.fontWeight = "bold";
+			txt.style.backgroundColor = "yellow";
+		}
+		
+		function UpdateMinMi(){
+			minmi=parseMinSec(document.getElementById("minmi").value);
+			CalculateMinMi();
+			updateTextBoxes();
+			clearStyles();
+			
+			var txt=document.getElementById("minmi");
+			txt.style.fontWeight = "bold";
+			txt.style.backgroundColor = "yellow";
+		}
+		
+		function UpdateKmH(){
+			kmh=parseFloat(document.getElementById("kmh").value);
+			CalculateKmH();
+			updateTextBoxes();
+			clearStyles();
+			
+			var txt=document.getElementById("kmh");
+			txt.style.fontWeight = "bold";
+			txt.style.backgroundColor = "yellow";
+		}
+		
+		function UpdateMiH(){
+			mih=parseFloat(document.getElementById("mih").value);
+			CalculateMiH();
+			updateTextBoxes();
+			clearStyles();
+			
+			var txt=document.getElementById("mih");
+			txt.style.fontWeight = "bold";
+			txt.style.backgroundColor = "yellow";
+		}
+		
+		
+		function parseMinSec(s){
+			var T = s.split(':');
+			
+			if (T.length>2){
+				return 0;
+			}else if(T.length==2){
+				var p;
+				p=parseInt(T[0])+parseInt(T[1])/60;
+			}else if(T.length==1){
+				var p;
+				p=parseInt(T[0]);
+			}else{
+				return 0;
+			}
+			return p;
+			
+		}
+		
+		function clearStyles(){
+			var txt1=document.getElementById("minmi");
+			txt1.style.fontWeight = "";
+			txt1.style.backgroundColor = "";
+			var txt2=document.getElementById("minkm");
+			txt2.style.fontWeight = "";
+			txt2.style.backgroundColor = "";
+			var txt3=document.getElementById("kmh");
+			txt3.style.fontWeight = "";
+			txt3.style.backgroundColor = "";
+			var txt4=document.getElementById("mih");
+			txt4.style.fontWeight = "";
+			txt4.style.backgroundColor = "";
+		}
+		
+		function updateTextBoxes(){
+			document.getElementById("minmi").value=floatToMinSecString(minmi);
+			document.getElementById("minkm").value=floatToMinSecString(minkm);
+			document.getElementById("kmh").value=floatToTwoDigitString(kmh);
+			document.getElementById("mih").value=floatToTwoDigitString(mih);
+		}
+		
+		function CalculateMinKm(){
+			minmi=1.60934*minkm;
+			kmh=60/minkm;
+			mih=60/minmi;
+		}
+		
+		function CalculateMinMi(){
+			minkm=minmi/1.60934;
+			kmh=60/minkm;
+			mih=60/minmi;
+		}
+		
+		function CalculateKmH(){
+			minkm=60/kmh;
+			minmi=1.60934*minkm;
+			mih=60/minmi;
+		}
+		
+		function CalculateMiH(){
+			minmi=60/mih;
+			minkm=minmi/1.60934;
+			kmh=60/minkm;
+		}
+		
+		function floatToMinSecString(f){
+			var sec = Math.round((f % 1)*60);
+			var min = Math.floor(f);
+			if (sec<10){
+				var minSec=min.toString() + ":0" + sec.toString();
+			}else{
+				var minSec=min.toString() + ":" + sec.toString();
+			}
+			
+			return minSec;
+		}
+		
+		function floatToTwoDigitString(f){
+			var f2=Math.round(f*100)/100;
+			return f2.toString();
+		}
+	</script>
+	<style type="text/css">
+      canvas { border: 1px solid black; }
+		th {
+		  text-align: center;
+		}
+		td {
+		  text-align: center;
+		}
+		body { background-color: #F8F8F8; } 
+    </style>
+	  
+	  
+  </head>
+  <body onload="init();">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Menu</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="http:\\zigunov.com">Back to zigunov.com <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Other Projects</a>
+          </li>
+          <li class="nav-item dropdown"> </li>
+        </ul>
+</div>
+    </nav>
+    <section> 
+	  <div style="clear: left;"></div>    
+		<div style="clear: left;"></div>
+		<h2>A running pace converter that doesn't suck</h2>
+        <h6>Because let's be honest: no one wants a running pace chart. Type in <u>any</u> of the boxes and press enter. The conversion automatically happens. The last manually changed textbox is shown in yellow, bold font. </h6>
+	
+	<br><br><br><br>
+
+<table style="width:60%" align="center">
+  <tr>
+    <th>Min/Mi</th>
+    <th>Min/Km</th>
+    <th>Km/h</th>
+    <th>Mi/h</th>
+  </tr>
+  <tr>
+    <td><input type="text" id="minmi" name="minmi" value="0" onchange="UpdateMinMi()"></td>
+    <td><input type="text" id="minkm" name="minkm" value="0" onchange="UpdateMinKm()"></td>
+    <td><input type="text" id="kmh" name="kmh" value="0" onchange="UpdateKmH()"></td>
+    <td><input type="text" id="mih" name="mih" value="0" onchange="UpdateMiH()"></td>
+  </tr>
+</table>
+	  
+	<br><br><br><br>
+	 </section>
+    
+    <footer class="text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <p>Copyright © Fernando Zigunov 2020. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap-4.4.1.js"></script>
+  </body>
+</html>
