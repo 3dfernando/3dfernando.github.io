@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Synthetic Jet Demonstration</title>
+<style>
+@font-face {
+	font-family: "Trueno";
+	src: url("truenosbd.otf");
+}
+  
+body {
+	overflow: hidden; /* Hide scrollbars */
+}
+table, th, td {
+	border: 1px solid black;
+}
+th {
+	color: white;
+	font-family:Trueno;
+	font-size:24px;
+	vertical-align: center;
+	background-color: #222222;
+}
+a{
+	color: white;
+	font-family:Trueno;
+	font-size:24px;
+	vertical-align: center;
+	text-decoration: none;
+}
+th a {
+	display: inline-block;
+	height:100%;
+	width:100%;
+	vertical-align: center;
+}
+
+</style>
+</head>
+<script>
+function myFunction() {
+alert("You clicked the coffee cup!");
+}
+</script>
+
+<body BGcolor="#000000">
+<table style="width:1280px; height:720px">
+	<tr style="height:100px">
+		<th><a href="a.html"><br>Home</a></th>
+		<th><a href="a.html"><br>Working Principle</a></th>
+		<th><a href="a.html"><br>Applications</a></th>
+		<th><a href="a.html"><br>Demo</a></th>
+	</tr>
+	
+	<tr style="height:520px vertical-align: top;"> 
+		<td colspan="4">
+			<div id="container" style="height:520px;">
+				<video style="position: absolute;" height="520"  width="1280" id="vid" autoplay muted loop>
+					<source src="Renders/01 - Render - Synthetic Jet Slide 1.mp4" type="video/mp4">
+					Error. Contact the administrator.
+				</video>
+				<a href="a.html"><img src="TransparentPixel.png" usemap="#workmap" height="520"  width="1280" style="position: absolute;"/></a>
+			</div>
+		</td>
+	</tr>
+	
+</table>
+</body>
+	
+</html>
