@@ -13,7 +13,7 @@ body {
 	overflow: hidden; /* Hide scrollbars */
 }
 table, th, td {
-	border: 0px solid black;
+	border: 1px solid black;
 }
 th {
 	color: white;
@@ -39,18 +39,35 @@ th a {
 </style>
 </head>
 <script>
-function myFunction() {
-alert("You clicked the coffee cup!");
+function debounce(callback, timeout, _this) {
+    var timer;
+    return function(e) {
+        var _that = this;
+        if (timer)
+            clearTimeout(timer);
+        timer = setTimeout(function() { 
+            callback.call(_this || _that, e);
+        }, timeout);
+    }
 }
+
+// events
+var userAction = debounce(function(e) {
+    window.location.href = "synthDemo_Cover.html";
+}, 600000);
+
+document.addEventListener("mousemove", userAction, false);
+document.addEventListener("click", userAction, false);
+document.addEventListener("scroll", userAction, false);
 </script>
 
 <body BGcolor="#000000">
 <table style="width:1280px; height:800px">
 	<tr style="height:100px">
 		<th><a href="synthDemo_Cover.html"><br>Home</a></th>
-		<th><a href="a.html"><br>Working Principle</a></th>
-		<th><a href="a.html"><br>Applications</a></th>
-		<th><a href="a.html"><br>Demo</a></th>
+		<th style="background-color: #444444;"><a href="synthDemo_Intro.html"><br>Working Principle</a></th>
+		<th><a href="synthDemo_Cover.html"><br>Applications</a></th>
+		<th><a href="synthDemo_Cover.html"><br>Demo</a></th>
 	</tr>
 	
 	<tr style="height:700px vertical-align: top;"> 
@@ -60,7 +77,7 @@ alert("You clicked the coffee cup!");
 					<source src="Renders/01 - Render - Synthetic Jet Slide 1.mp4" type="video/mp4">
 					Error. Contact the administrator.
 				</video>
-				<a href="a.html"><img src="TransparentPixel.png" usemap="#workmap" height="700"  width="1280" style="position: absolute;"/></a>
+				<a href="synthDemo_Vortex.html"><img src="TransparentPixel.png" usemap="#workmap" height="700"  width="1280" style="position: absolute;"/></a>
 			</div>
 		</td>
 	</tr>
