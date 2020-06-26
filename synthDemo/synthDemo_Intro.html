@@ -38,36 +38,15 @@ th a {
 
 </style>
 </head>
-<script>
-function debounce(callback, timeout, _this) {
-    var timer;
-    return function(e) {
-        var _that = this;
-        if (timer)
-            clearTimeout(timer);
-        timer = setTimeout(function() { 
-            callback.call(_this || _that, e);
-        }, timeout);
-    }
-}
-
-// events
-var userAction = debounce(function(e) {
-    window.location.href = "synthDemo_Cover.html";
-}, 600000);
-
-document.addEventListener("mousemove", userAction, false);
-document.addEventListener("click", userAction, false);
-document.addEventListener("scroll", userAction, false);
-</script>
 
 <body BGcolor="#000000">
+<script src="Timeout.js" type="text/javascript" ></script>
 <table style="width:1280px; height:800px">
 	<tr style="height:100px">
 		<th><a href="synthDemo_Cover.html"><br>Home</a></th>
 		<th style="background-color: #444444;"><a href="synthDemo_Intro.html"><br>Working Principle</a></th>
 		<th><a href="synthDemo_Cover.html"><br>Applications</a></th>
-		<th><a href="synthDemo_Cover.html"><br>Demo</a></th>
+		<th><a href="synthDemo_Demo.html"><br>Demo</a></th>
 	</tr>
 	
 	<tr style="height:700px vertical-align: top;"> 
