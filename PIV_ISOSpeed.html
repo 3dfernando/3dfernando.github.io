@@ -60,7 +60,8 @@
 	  <div style="clear: left;"></div>    
 		<div style="clear: left;"></div>
 		<h2><b>How bright are my PIV particles?</b></h2>
-        <h6>This little calculator allows an estimate of the brightness of small particles illuminated by laser light, as seen by a camera with a rated ISO.</h6>
+        <h6>This little calculator allows an estimate of the brightness of small particles illuminated by laser light, as seen by a camera with a rated ISO. <br> If your camera is not rated by ISO, see 
+		    <a href="http:\\zigunov.com\?p=3411">PIV post</span></a> for details on how to find the saturation exposure in photons given a quantum efficiency and amplifier gain.</h6>
         <h6>Values in <b>bold</b> are inputs.</h6>
 	
 	<br><br>
@@ -71,7 +72,7 @@
     <td span=2><b>Camera Parameters</b> <td>
   </tr>  
   <tr>
-    <td ><b>ISO Film Speed or EI (S)</b> <td><input type="text" id="ISO" name="ISO" value="1600" onchange="Recalculate()"></td>
+    <td ><b>ISO Film Speed or EI (S)</b> <td><input type="text" id="ISO" name="ISO" value="1600" onchange="Recalculate()" title="Rated ISO film speed. Note that some manufacturers rate their cameras rate based on the maximum film speed in their datasheets, but at those film speeds the noise is very large. &#013; &#013; Also see original PIV post (link in navbar) regarding rated ISO vs actual ISO for cameras I had access to."></td>
   </tr>  
   <tr>
     <td>Exposure for 18% gray (H<sub>18</sub>) [lux-s] <td><input type="text" id="H18" name="H18" disabled="disabled"></td>
@@ -80,22 +81,22 @@
     <td>Exposure for 100% gray (H<sub>100</sub>) [lux-s] <td><input type="text" id="H100" name="H100" disabled="disabled"></td>
   </tr>
   <tr>
-    <td><b>Wavelength (λ) [nm]</b> <td><input type="text" id="lambda" name="lambda" value="532" onchange="Recalculate()"></td>
+    <td><b>Wavelength (λ) [nm]</b> <td><input type="text" id="lambda" name="lambda" value="532" onchange="Recalculate()"  title="Wavelength of incoming monochromatic light. This calculator doesn't support white or wide-spectrum light."></td>
   </tr>  
   <tr>
-    <td>Photon energy [J] <td><input type="text" id="photonEnergy" name="photonEnergy" disabled="disabled"></td>
+    <td>Photon energy (ε<sub>ph</sub>) [J] <td><input type="text" id="photonEnergy" name="photonEnergy" disabled="disabled" title="This is the energy of a single photon from the Planck-Einstein relation."></td>
   </tr>
   <tr>
-    <td>Photopic luminous efficiency V(λ) <td><input type="text" id="phEff" name="phEff" disabled="disabled"></td>
+    <td>Photopic luminous efficiency V(λ) <td><input type="text" id="phEff" name="phEff" disabled="disabled"   title="To convert from lumens to Watts"></td>
   </tr>
   <tr>
-    <td><b>Pixel size [μm]</b> <td><input type="text" id="pixelsize" name="pixelsize" value="5.5" onchange="Recalculate()"></td>
+    <td><b>Pixel size (w<sub>px</sub>) [μm]</b> <td><input type="text" id="pixelsize" name="pixelsize" value="5.5" onchange="Recalculate()" title="Assumes square pixels."></td>
   </tr>
   <tr>
     <td><b>Lens focal distance (f) [mm]</b> <td><input type="text" id="focaldist" name="focaldist" value="105" onchange="Recalculate()"></td>
   </tr>
   <tr>
-    <td><b>Distance from particle to lens (i) [mm]</b> <td><input type="text" id="particledist" name="particledist" value="1000" onchange="Recalculate()"></td>
+    <td><b>Distance from particle to lens (i) [mm]</b> <td><input type="text" id="particledist" name="particledist" value="1000" onchange="Recalculate()" title="Distance to lens entrance pupil."></td>
   </tr>
   <tr>
     <td><b>Lens f-number (N)</b> <td><input type="text" id="fnumber" name="fnumber" value="5.6" onchange="Recalculate()"></td>
@@ -104,53 +105,53 @@
     <td>Saturation exposure energy per pixel (h<sub>100,e</sub>) [J] <td><input type="text" id="H100e" name="H100e" disabled="disabled"></td>
   </tr>
   <tr>
-    <td>Saturation exposure energy per pixel (h<sub>100,ph</sub>) [photons] <td><input type="text" id="H100ph" name="H100ph" disabled="disabled"></td>
+    <td>Saturation exposure energy per pixel (h<sub>100,ph</sub>) [photons] <td><input type="text" id="H100ph" name="H100ph" disabled="disabled" title="Number of photons required to saturate the pixel under these conditions."></td>
   </tr> 
   <tr>
-    <td><b>Gaussian particle image std. dev. [px]</b> <td><input type="text" id="fstd" name="fstd" value="1" onchange="Recalculate()"></td>
+    <td><b>Gaussian particle image std. dev. [px]</b> <td><input type="text" id="fstd" name="fstd" value="1" onchange="Recalculate()" title="Particles typically don't focus on a single pixel due to aberrations on the lens. This is an empirical definition of particle image size. See on the right how the particle would look like. Adjust according to your experience with your problem."></td>
   </tr>
   <tr>
-    <td><b>Camera view angle (0deg=looking at laser)</b> <td><input type="text" id="camAngle" name="camAngle" value="60" onchange="Recalculate()"></td>
+    <td><b>Camera view angle (0deg=looking at laser)</b> <td><input type="text" id="camAngle" name="camAngle" value="60" onchange="Recalculate()" title="Here we define the camera position to facilitate the interpretation of the curve plotted below. For this fixed angle (where 0deg=looking *at* the light source and 180deg=looking *from* the light source), we can compute the number of photons per pixel(last boxes below) and see the effect of the parameters for a fixed angle."></td>
   </tr>
   
   <tr style="border-top: 1px solid black; color: blue;">
     <td span=2><b>Illumination Parameters</b> <td>
   </tr>
   <tr>
-    <td><b>Laser pulse energy (Q<sub>laser</sub>) [J]</b> <td><input type="text" id="Qlaser" name="Qlaser" value="0.2" onchange="Recalculate()"></td>
+    <td><b>Laser pulse energy (Q<sub>laser</sub>) [J]</b> <td><input type="text" id="Qlaser" name="Qlaser" value="0.2" onchange="Recalculate()" title="The light energy is all that matters. If you have a continuous light source, this is exposure time * power."></td>
   </tr>
   <tr>
-    <td><b>Laser pulse time (t) [ns]</b> <td><input type="text" id="time" name="time" value="20" onchange="Recalculate()"></td>
+    <td><b>Laser pulse time (t) [ns]</b> <td><input type="text" id="time" name="time" value="20" onchange="Recalculate()" title="The pulse time doesn't change any of the results. But it is an intermediary qty to convert between energy and power."></td>
   </tr>
   <tr>
-    <td><b>Laser beam width (w<sub>beam</sub>) [mm]</b> <td><input type="text" id="wbeam" name="wbeam" value="2" onchange="Recalculate()"></td>
+    <td><b>Laser beam width (w<sub>beam</sub>) [mm]</b> <td><input type="text" id="wbeam" name="wbeam" value="2" onchange="Recalculate()" title="The width and length define the area the light spreads out at the location where the particle is."></td>
   </tr>
   <tr>
-    <td><b>Laser beam length (l<sub>beam</sub>) [mm]</b> <td><input type="text" id="lbeam" name="lbeam" value="20" onchange="Recalculate()"></td>
+    <td><b>Laser beam length (l<sub>beam</sub>) [mm]</b> <td><input type="text" id="lbeam" name="lbeam" value="20" onchange="Recalculate()" title="The width and length define the area the light spreads out at the location where the particle is."></td>
   </tr>
   <tr>
     <td>Laser irradiance (E<sub>laser</sub>) [W/m<sup>2</sup>] <td><input type="text" id="irradiance" name="irradiance" disabled="disabled"></td>
   </tr>
   <tr>
-    <td><b>Particle Radius (r) [μm]</b> <td><input type="text" id="particleradius" name="particleradius" value="5" onchange="Recalculate()"></td>
+    <td><b>Particle Radius (r) [μm]</b> <td><input type="text" id="particleradius" name="particleradius" value="5" onchange="Recalculate()" title="Particle RADIUS, not diameter!"></td>
   </tr>  
   <tr>
-    <td><b>Particle IOR, real part (n<sub>Re</sub>)</b> <td><input type="text" id="IOR_Re" name="IOR_Re" value="1.333" onchange="Recalculate()"></td>
+    <td><b>Particle IOR, real part (n<sub>Re</sub>)</b> <td><input type="text" id="IOR_Re" name="IOR_Re" value="1.333" onchange="Recalculate()" title="This is the index of refraction of the particle material, here assumed to be homogeneous. We currently don't support bubble-like (shell) particles."></td>
   </tr>  
   <tr>
-    <td><b>Particle IOR, imaginary part (n<sub>Im</sub>)</b> <td><input type="text" id="IOR_Im" name="IOR_Im" value="0" onchange="Recalculate()"></td>
+    <td><b>Particle IOR, imaginary part (n<sub>Im</sub>)</b> <td><input type="text" id="IOR_Im" name="IOR_Im" value="0" onchange="Recalculate()" title="Extinction coefficient of the particle material."></td>
   </tr>  
   <tr>
-    <td><b>Medium IOR (n<sub>medium, Re</sub>)</b> <td><input type="text" id="IOR_Medium" name="IOR_Medium" value="0" onchange="Recalculate()"></td>
+    <td><b>Medium IOR (n<sub>medium, Re</sub>)</b> <td><input type="text" id="IOR_Medium" name="IOR_Medium" value="0" onchange="Recalculate()" title="Index of refraction of the medium, assumed to have extinction coefficient of zero."></td>
   </tr> 
   <tr>
     <td>Radiant flux emitted by particle (Φ<sub>e</sub>) [W] <td><input type="text" id="radflux" name="radflux" disabled="disabled"></td>
   </tr>  
   <tr>
-    <td>Photons/pixel at the camera, perp. [photons] <td><input type="text" id="photonsPerPixelPerp" name="photonsPerPixelPerp" disabled="disabled"></td>
+    <td>Photons/pixel at the camera, perp. [photons] <td><input type="text" id="photonsPerPixelPerp" name="photonsPerPixelPerp" disabled="disabled" title="For the fixed camera view angle above, this is the number of photons registered in the brightest pixel for perpendicularly polarized light."></td>
   </tr>  
   <tr style="border-bottom: 1px solid black">
-    <td>Photons/pixel at the camera, par. [photons] <td><input type="text" id="photonsPerPixelPar" name="photonsPerPixelPar" disabled="disabled"></td>
+    <td>Photons/pixel at the camera, par. [photons] <td><input type="text" id="photonsPerPixelPar" name="photonsPerPixelPar" disabled="disabled" title="For the fixed camera view angle above, this is the number of photons registered in the brightest pixel for perpendicularly polarized light."></td>
   </tr> 
     
 </table>
@@ -175,7 +176,7 @@
 
 <div style="width:70%; margin-left:10px">
 <h3><b>How do I know if my polarization is perpendicular or parallel?</b></h3>
-<h6>It's very simple: use the plane in space formed by the three points: (1) light source, (2) particle and (3) camera. If the electric field polarization vector is parallel to this plane, then use the "parallel" polarization curve. If it is perpendicular to the plane, then use the "perpendicular" polarization curve. See picture below for a graphical explanation.<h6>
+<h6>It's very simple: use the plane in space formed by the three points: (1) light source, (2) particle and (3) camera; <u>or</u> the two vectors (A) incident light and (B) scattered light. If the electric field polarization vector is parallel to this plane, then use the "parallel" polarization curve. If it is perpendicular to the plane, then use the "perpendicular" polarization curve. See picture below for a graphical explanation.<h6>
 </di> 
 
 <table>
