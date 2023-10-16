@@ -98,6 +98,15 @@ function init(){
 	document.getElementById("IOR_Im").value="0";
 	document.getElementById("IOR_Medium").value="1";
 	document.getElementById("camAngle").value="60";
+		
+	document.getElementById("lambdaQE").value="532";
+	document.getElementById("qeff").value="70";	
+	document.getElementById("eSat").value="40000";
+
+	document.getElementById("lambda_Direct").value="532";
+	document.getElementById("H100ph_Direct").value="60000";
+	
+	
 	
 	//Tries to review if the form has cookies and loads them
 	loadFormFromCookies();
@@ -116,22 +125,50 @@ function photopicEfficiency(l){
 }
 
 function Recalculate(){
-	ISO_Speed=document.getElementById("ISO").value;
-	Exposure_H18=10.0/ISO_Speed; 
-	Exposure_H100=Exposure_H18*100.0/18.0; //lux-s = lumen.s/m2
-	lambda=document.getElementById("lambda").value;
-	phEfficiency=photopicEfficiency(lambda);
+	//Recalculates the whole page.
+	
+	//First finds which tab is active
+	if (document.getElementById("ISO").style.display == 'block') {
+		//ISO provided
+		ISO_Speed=document.getElementById("ISO").value;
+		Exposure_H18=10.0/ISO_Speed; 
+		Exposure_H100=Exposure_H18*100.0/18.0; //lux-s = lumen.s/m2
+		lambda=document.getElementById("lambda").value;
+		phEfficiency=photopicEfficiency(lambda);
+		Exposure_H100e=(pixelsize*pixelsize)*Exposure_H100/(683.002*phEfficiency); //m2 * (lumen.s/m2) / (lumen/W) = W.s=J
+		var h_times_c=1.989e-25; //Planck constant * speed of light [J/m]
+		photonEnergy = h_times_c/(lambda*1e-9); //photon energy in J
+		Exposure_H100ph=Exposure_H100e/photonEnergy; //photon count for saturation		
+	}else if(document.getElementById("Quantum").style.display == 'block'){
+		//Quantum efficiency provided
+		lambda=Number(document.getElementById("lambdaQE").value);
+		var SensorQE=Number(document.getElementById("qeff").value);
+		var SatElectrons=Number(document.getElementById("eSat").value);
+				
+		Exposure_H100ph=SatElectrons/(SensorQE/100);
+		
+		var h_times_c=1.989e-25; //Planck constant * speed of light [J/m]
+		photonEnergy = h_times_c/(lambda*1e-9); //photon energy in J
+		Exposure_H100e=Exposure_H100ph*photonEnergy; //Energy for saturation	
+	}else if(document.getElementById("SatPhotons").style.display == 'block'){
+		//Saturation photons input directly
+		lambda=Number(document.getElementById("lambda_Direct").value);
+		Exposure_H100ph=Number(document.getElementById("H100ph_Direct").value);
+		
+		var h_times_c=1.989e-25; //Planck constant * speed of light [J/m]
+		photonEnergy = h_times_c/(lambda*1e-9); //photon energy in J
+		Exposure_H100e=Exposure_H100ph*photonEnergy; //Energy for saturation	
+	}else{
+		return;
+	}
+	
+	//Does the remainder calculations
 	pixelsize=document.getElementById("pixelsize").value/1e6;
 	focaldist=document.getElementById("focaldist").value/1e3;
 	particledist=document.getElementById("particledist").value/1e3;
 	fnumber=document.getElementById("fnumber").value;	
 	lensdist=(focaldist*particledist)/(particledist-focaldist);	
-	
-	Exposure_H100e=(pixelsize*pixelsize)*Exposure_H100/(683.002*phEfficiency); //m2 * (lumen.s/m2) / (lumen/W) = W.s=J
-	var h_times_c=1.989e-25; //Planck constant * speed of light [J/m]
-	photonEnergy = h_times_c/(lambda*1e-9); //photon energy in J
-	Exposure_H100ph=Exposure_H100e/photonEnergy; //photon count for saturation
-	
+		
 	
 	Qlaser=document.getElementById("Qlaser").value;
 	t_ns=document.getElementById("time").value;
@@ -169,6 +206,13 @@ function updateTextBoxes(){
 	document.getElementById("radflux").value=expo(radFlux,3);
 	document.getElementById("photonsPerPixelPerp").value=photonsPerPixelPerp.toFixed(0) + ' (' + (100*photonsPerPixelPerp/Exposure_H100ph).toFixed(1) + '%)';
 	document.getElementById("photonsPerPixelPar").value=photonsPerPixelPar.toFixed(0) + ' (' + (100*photonsPerPixelPar/Exposure_H100ph).toFixed(1) + '%)';
+		
+	document.getElementById("photonEnergyQE").value=expo(photonEnergy, 4);
+	document.getElementById("H100e_QE").value=expo(Exposure_H100e, 3);
+	document.getElementById("H100ph_QE").value=Exposure_H100ph.toFixed(0);
+	
+	document.getElementById("photonEnergy_Direct").value=expo(photonEnergy, 4);
+	document.getElementById("H100e_Direct").value=expo(Exposure_H100e, 3);
 }
 
 function updateMieScatteringPlot(){
@@ -226,7 +270,7 @@ function updateMieScatteringPlot(){
 
 function updateCanvas(){
 	//Makes a little image of the particle as a gaussian
-	var nstd=1.5;
+	var nstd=2;
 	var arrSize = 1+2*nstd*Math.ceil(particleImageStdPx);
 	particleGaussian = [...Array(arrSize)].map(e => Array(arrSize).fill(0));
 	gaussianTotal = 0;
