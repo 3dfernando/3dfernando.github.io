@@ -21,8 +21,7 @@
 	<script src="PIV_MieScattering/ComplexNumber.js" type="text/javascript"></script>
 	<script src="PIV_MieScattering/ComplexTrig.js" type="text/javascript"></script>
 	<script src="PIV_MieScattering/bhmie.js" type="text/javascript"></script>	  
-	
-  
+	  
 	<style type="text/css">
       
 		td {
@@ -33,6 +32,52 @@
 		table {
             border-collapse: collapse;
         }
+		
+		/* Style the tab */
+		.tab {
+		  overflow: hidden;
+		  border: 1px solid #ccc;
+		  background-color: #f1f1f1;
+		}		
+		
+		/* Style the buttons inside the tab */
+		.tab button {
+		  background-color: inherit;
+		  float: left;
+		  border: none;
+		  outline: none;
+		  cursor: pointer;
+		  padding: 14px 16px;
+		  transition: 0.3s;
+		  font-size: 17px;
+		}
+
+		/* Change background color of buttons on hover */
+		.tab button:hover {
+		  background-color: #ddd;
+		}
+
+		/* Create an active/current tablink class */
+		.tab button.active {
+		  background-color: #ccc;
+		}
+
+		/* Style the tab content */
+		.tabcontent {
+		  display: none;
+		  padding: 6px 12px;
+		  border: 1px solid #ccc;
+		  border-top: none;
+		}
+		.tabcontent {
+		  animation: fadeEffect 1s; /* Fading effect takes 1 second */
+		}
+		
+		/* Go from zero to full opacity */
+		@keyframes fadeEffect {
+		  from {opacity: 0;}
+		  to {opacity: 1;}
+		}
     </style>
 	  
 	  
@@ -68,57 +113,124 @@
 	  <div style="clear: left;"></div>    
 		<div style="clear: left;"></div>
 		<h2><b>How bright are my PIV particles?</b></h2>
-        <h6>This little calculator allows an estimate of the brightness of small particles illuminated by laser light, as seen by a camera with a rated ISO. <br> If your camera is not rated by ISO, see 
-		    <a href="http:\\zigunov.com\?p=3411">PIV post</span></a> for details on how to find the saturation exposure in photons given a quantum efficiency and amplifier gain.</h6>
+        <h6>This little calculator allows an estimate of the brightness of small particles illuminated by laser light, as seen by a camera with a rated ISO or a rated amp gain/quantum efficiency. <br> See 
+		    <a href="http:\\zigunov.com\?p=3411">PIV post</span></a> for more details on how each method calculates the saturation exposure.</h6>
         <h6>Values in <b>bold</b> are inputs.</h6>
 	<br><br>
 <table style="width:75%; margin-left: 10px;">
 <tr><td style="width:50%">
+
+	<div class="tab">
+	  <button class="tablinks" onclick="openTab(event, 'ISO')" id="defaultOpen">Known Camera ISO</button>
+	  <button class="tablinks" onclick="openTab(event, 'Quantum')">Known Quantum Efficiency</button>
+	  <button class="tablinks" onclick="openTab(event, 'SatPhotons')">Input Sat. Photons Directly</button>
+	</div>
+
+	<!-- Tab content -->
+	<div id="ISO" class="tabcontent">	  
+	  <table>
+			<tr style="border-top: 1px solid black; color: blue;">
+				<td span=2><b>Saturation Photons Calculation - Known Camera ISO</b> <td>
+		  </tr>  
+		  <tr>
+			<td ><b>ISO Film Speed or EI (S)</b> <td><input type="text" id="ISO" name="ISO" value="1600" onchange="Recalculate()" title="Rated ISO film speed. Note that some manufacturers rate their cameras rate based on the maximum film speed in their datasheets, but at those film speeds the noise is very large. &#013; &#013; Also see original PIV post (link in navbar) regarding rated ISO vs actual ISO for cameras I had access to."></td>
+		  </tr>  
+		  <tr>
+			<td>Exposure for 18% gray (H<sub>18</sub>) [lux-s] <td><input type="text" id="H18" name="H18" disabled="disabled"></td>
+		  </tr>
+		  <tr>
+			<td>Exposure for 100% gray (H<sub>100</sub>) [lux-s] <td><input type="text" id="H100" name="H100" disabled="disabled"></td>
+		  </tr>
+		  <tr>
+			<td><b>Wavelength (λ) [nm]</b> <td><input type="text" id="lambda" name="lambda" value="532" onchange="Recalculate()"  title="Wavelength of incoming monochromatic light. This calculator doesn't support white or wide-spectrum light."></td>
+		  </tr>  
+		  <tr>
+			<td>Photon energy (ε<sub>ph</sub>) [J] <td><input type="text" id="photonEnergy" name="photonEnergy" disabled="disabled" title="This is the energy of a single photon from the Planck-Einstein relation."></td>
+		  </tr>
+		  <tr>
+			<td>Photopic luminous efficiency V(λ) <td><input type="text" id="phEff" name="phEff" disabled="disabled"   title="To convert from lumens to Watts"></td>
+		  </tr>
+		  <tr>
+			<td>Saturation exposure energy per pixel (h<sub>100,e</sub>) [J] <td><input type="text" id="H100e" name="H100e" disabled="disabled"></td>
+		  </tr>
+		  <tr>
+			<td>Saturation exposure energy per pixel (h<sub>100,ph</sub>) [photons] <td><input type="text" id="H100ph" name="H100ph" disabled="disabled" title="Number of photons required to saturate the pixel under these conditions."></td>
+		  </tr>
+	  </table>
+	  
+	</div>
+
+	<div id="Quantum" class="tabcontent">
+	  <table>
+			<tr style="border-top: 1px solid black; color: blue;">
+				<td span=2><b>Saturation Photons Calculation - Known Quantum Efficiency</b> <td>
+		  </tr>  		  
+		  <tr>
+			<td><b>Wavelength (λ) [nm]</b> <td><input type="text" id="lambdaQE" name="lambdaQE" value="532" onchange="Recalculate()"  title="Wavelength of incoming monochromatic light. This calculator doesn't support white or wide-spectrum light."></td>
+		  </tr>  
+		  <tr>
+			<td>Photon energy (ε<sub>ph</sub>) [J] <td><input type="text" id="photonEnergyQE" name="photonEnergyQE" disabled="disabled" title="This is the energy of a single photon from the Planck-Einstein relation."></td>
+		  </tr>		  
+		  <tr>
+			<td><b>Sensor quantum efficiency [%]</b> <td><input type="text" id="qeff" name="qeff" value="70" onchange="Recalculate()"  title="Quantum efficiency of the sensor at the given wavelength (from sensor datasheet). Given in electrons per photon (say 70% Q.E. means every 100 photons produce 70 electrons of signal in the pixel)"></td>
+		  </tr> 		  	  
+		  <tr>
+			<td><b>Saturation electrons</b> <td><input type="text" id="eSat" name="eSat" value="40000" onchange="Recalculate()"  title="Number of electrons to saturate the pixel (from camera datasheet). Depends on both pixel design in the sensor (sometimes called well depth) and the amplifier gain in the camera circuits. Typical values about 40000 to 60000."></td>
+		  </tr> 
+		  
+		  <tr>
+			<td>Saturation exposure energy per pixel (h<sub>100,e</sub>) [J] <td><input type="text" id="H100e_QE" name="H100e_QE" disabled="disabled"></td>
+		  </tr>
+		  <tr>
+			<td>Saturation exposure energy per pixel (h<sub>100,ph</sub>) [photons] <td><input type="text" id="H100ph_QE" name="H100ph_QE" disabled="disabled" title="Number of photons required to saturate the pixel under these conditions."></td>
+		  </tr>
+	  </table>		  
+	</div>
+
+	<div id="SatPhotons" class="tabcontent">
+	  <table>
+			<tr style="border-top: 1px solid black; color: blue;">
+				<td span=2><b>Saturation Photons Inputted Directly</b> <td>
+		  </tr> 
+ 		  
+		  <tr>
+			<td><b>Wavelength (λ) [nm]</b> <td><input type="text" id="lambda_Direct" name="lambda_Direct" value="532" onchange="Recalculate()"  title="Wavelength of incoming monochromatic light. This calculator doesn't support white or wide-spectrum light."></td>
+		  </tr>  
+		  <tr>
+			<td>Photon energy (ε<sub>ph</sub>) [J] <td><input type="text" id="photonEnergy_Direct" name="photonEnergy_Direct" disabled="disabled" title="This is the energy of a single photon from the Planck-Einstein relation."></td>
+		  </tr>	 
+		  <tr>
+			<td><b>Saturation exposure energy per pixel (h<sub>100,ph</sub>) [photons] <b><td><input type="text" id="H100ph_Direct" name="H100ph_Direct" onchange="Recalculate()" title="Number of photons required to saturate the pixel, directly provided by the user."></td>
+		  </tr>	 
+		  <tr>
+			<td>Saturation exposure energy per pixel (h<sub>100,e</sub>) [J] <td><input type="text" id="H100e_Direct" name="H100e_Direct" disabled="disabled"></td>
+		  </tr> 
+	  </table>	
+	</div>
+
+
 <table>
   <tr style="border-top: 1px solid black; color: blue;">
-    <td span=2><b>Camera Parameters</b> <td>
-  </tr>  
-  <tr>
-    <td ><b>ISO Film Speed or EI (S)</b> <td><input type="text" id="ISO" name="ISO" value="1600" onchange="Recalculate()" title="Rated ISO film speed. Note that some manufacturers rate their cameras rate based on the maximum film speed in their datasheets, but at those film speeds the noise is very large. &#013; &#013; Also see original PIV post (link in navbar) regarding rated ISO vs actual ISO for cameras I had access to."></td>
-  </tr>  
-  <tr>
-    <td>Exposure for 18% gray (H<sub>18</sub>) [lux-s] <td><input type="text" id="H18" name="H18" disabled="disabled"></td>
-  </tr>
-  <tr>
-    <td>Exposure for 100% gray (H<sub>100</sub>) [lux-s] <td><input type="text" id="H100" name="H100" disabled="disabled"></td>
-  </tr>
-  <tr>
-    <td><b>Wavelength (λ) [nm]</b> <td><input type="text" id="lambda" name="lambda" value="532" onchange="Recalculate()"  title="Wavelength of incoming monochromatic light. This calculator doesn't support white or wide-spectrum light."></td>
-  </tr>  
-  <tr>
-    <td>Photon energy (ε<sub>ph</sub>) [J] <td><input type="text" id="photonEnergy" name="photonEnergy" disabled="disabled" title="This is the energy of a single photon from the Planck-Einstein relation."></td>
-  </tr>
-  <tr>
-    <td>Photopic luminous efficiency V(λ) <td><input type="text" id="phEff" name="phEff" disabled="disabled"   title="To convert from lumens to Watts"></td>
-  </tr>
-  <tr>
-    <td><b>Pixel size (w<sub>px</sub>) [μm]</b> <td><input type="text" id="pixelsize" name="pixelsize" value="5.5" onchange="Recalculate()" title="Assumes square pixels."></td>
-  </tr>
-  <tr>
-    <td><b>Lens focal distance (f) [mm]</b> <td><input type="text" id="focaldist" name="focaldist" value="105" onchange="Recalculate()"></td>
-  </tr>
-  <tr>
-    <td><b>Distance from particle to lens (i) [mm]</b> <td><input type="text" id="particledist" name="particledist" value="1000" onchange="Recalculate()" title="Distance to lens entrance pupil."></td>
-  </tr>
-  <tr>
-    <td><b>Lens f-number (N)</b> <td><input type="text" id="fnumber" name="fnumber" value="5.6" onchange="Recalculate()"></td>
-  </tr>
-  <tr>
-    <td>Saturation exposure energy per pixel (h<sub>100,e</sub>) [J] <td><input type="text" id="H100e" name="H100e" disabled="disabled"></td>
-  </tr>
-  <tr>
-    <td>Saturation exposure energy per pixel (h<sub>100,ph</sub>) [photons] <td><input type="text" id="H100ph" name="H100ph" disabled="disabled" title="Number of photons required to saturate the pixel under these conditions."></td>
+    <td span=2><b>Camera Optics Setup</b> <td>
   </tr> 
   <tr>
-    <td><b>Gaussian particle image std. dev. [px]</b> <td><input type="text" id="fstd" name="fstd" value="1" onchange="Recalculate()" title="Particles typically don't focus on a single pixel due to aberrations on the lens. This is an empirical definition of particle image size. See on the right how the particle would look like. Adjust according to your experience with your problem."></td>
+	<td><b>Pixel size (w<sub>px</sub>) [μm]</b> <td><input type="text" id="pixelsize" name="pixelsize" value="5.5" onchange="Recalculate()" title="Assumes square pixels."></td>
   </tr>
   <tr>
-    <td><b>Camera view angle (0deg=looking at laser)</b> <td><input type="text" id="camAngle" name="camAngle" value="60" onchange="Recalculate()" title="Here we define the camera position to facilitate the interpretation of the curve plotted below. For this fixed angle (where 0deg=looking *at* the light source and 180deg=looking *from* the light source), we can compute the number of photons per pixel(last boxes below) and see the effect of the parameters for a fixed angle."></td>
+	<td><b>Lens focal distance (f) [mm]</b> <td><input type="text" id="focaldist" name="focaldist" value="105" onchange="Recalculate()"></td>
+  </tr>
+  <tr>
+	<td><b>Distance from particle to lens (i) [mm]</b> <td><input type="text" id="particledist" name="particledist" value="1000" onchange="Recalculate()" title="Distance to lens entrance pupil."></td>
+  </tr>
+  <tr>
+	<td><b>Lens f-number (N)</b> <td><input type="text" id="fnumber" name="fnumber" value="5.6" onchange="Recalculate()"></td>
+  </tr>
+  
+  <tr>
+	<td><b>Gaussian particle image std. dev. [px]</b> <td><input type="text" id="fstd" name="fstd" value="1" onchange="Recalculate()" title="Particles typically don't focus on a single pixel due to aberrations on the lens. This is an empirical definition of particle image size. See on the right how the particle would look like. Adjust according to your experience with your problem."></td>
+  </tr>
+  <tr>
+	<td><b>Camera view angle (0deg=looking at laser)</b> <td><input type="text" id="camAngle" name="camAngle" value="60" onchange="Recalculate()" title="Here we define the camera position to facilitate the interpretation of the curve plotted below. For this fixed angle (where 0deg=looking *at* the light source and 180deg=looking *from* the light source), we can compute the number of photons per pixel(last boxes below) and see the effect of the parameters for a fixed angle."></td>
   </tr>
   
   <tr style="border-top: 1px solid black; color: blue;">
@@ -183,7 +295,7 @@
 
 <div style="width:70%; margin-left:10px">
 <h3><b>How do I know if my polarization is perpendicular or parallel?</b></h3>
-<h6>It's very simple: use the plane in space formed by the three points: (1) light source, (2) particle and (3) camera; <u>or</u> the two vectors (A) incident light and (B) scattered light. If the electric field polarization vector is parallel to this plane, then use the "parallel" polarization curve. If it is perpendicular to the plane, then use the "perpendicular" polarization curve. See picture below for a graphical explanation.<h6>
+<h6>It's very simple: use the plane in space formed by the three points: (1) light source, (2) particle and (3) camera; <u>or</u> the two vectors (A) incident light and (B) scattered light. If the electric field polarization vector is parallel to this plane, then use the "parallel" polarization curve. If it is perpendicular to the plane, then use the "perpendicular" polarization curve. Note that your laser light could be polarized at any arbitrary angle with respect to this plane, so the actual brightness will be somewhere in between these two numbers, in practice. See picture below for a graphical explanation.<h6>
 </di> 
 
 <table>
@@ -200,6 +312,34 @@
 	<br><br>
 	<br><br>
 	<br><br>
+	
+	
+	
+	<script>
+		
+		function openTab(evt, cityName) {
+		  var i, tabcontent, tablinks;
+		  tabcontent = document.getElementsByClassName("tabcontent");
+		  for (i = 0; i < tabcontent.length; i++) {
+			tabcontent[i].style.display = "none";
+		  }
+		  tablinks = document.getElementsByClassName("tablinks");
+		  for (i = 0; i < tablinks.length; i++) {
+			tablinks[i].className = tablinks[i].className.replace(" active", "");
+		  }
+		  document.getElementById(cityName).style.display = "block";
+		  evt.currentTarget.className += " active";
+		  
+		  Recalculate();
+		}
+		document.getElementById("defaultOpen").click();		
+	</script>
+	
+	
+	
+	
+	
+	
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="js/jquery-3.4.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
