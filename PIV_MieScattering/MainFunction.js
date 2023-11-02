@@ -82,7 +82,7 @@ const ScatteringPlot = new Chart("ScatteringPlot", {
 
 function init(){
 	//Fills the form with the default values
-	document.getElementById("ISO").value="400";
+	document.getElementById("ISOtext").value="400";
 	document.getElementById("lambda").value="532";
 	document.getElementById("Qlaser").value="0.2";
 	document.getElementById("time").value="20";
@@ -130,7 +130,7 @@ function Recalculate(){
 	//First finds which tab is active
 	if (document.getElementById("ISO").style.display == 'block') {
 		//ISO provided
-		ISO_Speed=document.getElementById("ISO").value;
+		ISO_Speed=document.getElementById("ISOtext").value;
 		Exposure_H18=10.0/ISO_Speed; 
 		Exposure_H100=Exposure_H18*100.0/18.0; //lux-s = lumen.s/m2
 		lambda=document.getElementById("lambda").value;
@@ -195,7 +195,7 @@ function Recalculate(){
 }
 
 function updateTextBoxes(){
-	document.getElementById("ISO").value=ISO_Speed;
+	document.getElementById("ISOtext").value=ISO_Speed;
 	document.getElementById("H18").value=expo(Exposure_H18, 3);
 	document.getElementById("H100").value=expo(Exposure_H100, 3);
 	document.getElementById("H100e").value=expo(Exposure_H100e, 3);
