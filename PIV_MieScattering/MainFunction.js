@@ -127,6 +127,26 @@ function photopicEfficiency(l){
 function Recalculate(){
 	//Recalculates the whole page.
 	
+	//Gets the inputs
+	pixelsize=document.getElementById("pixelsize").value/1e6;
+	focaldist=document.getElementById("focaldist").value/1e3;
+	particledist=document.getElementById("particledist").value/1e3;
+	fnumber=document.getElementById("fnumber").value;	
+	
+	Qlaser=document.getElementById("Qlaser").value;
+	t_ns=document.getElementById("time").value;
+	wbeam_mm=document.getElementById("wbeam").value;
+	lbeam_mm=document.getElementById("lbeam").value;
+	
+	IOR_Re=document.getElementById("IOR_Re").value;	
+	IOR_Im=document.getElementById("IOR_Im").value;	
+	IOR_Medium=document.getElementById("IOR_Medium").value;	
+	
+	camAngle=document.getElementById("camAngle").value;	
+	particleRadius_m=document.getElementById("particleradius").value/1e6;	
+	particleImageStdPx=document.getElementById("fstd").value;
+	
+	
 	//First finds which tab is active
 	if (document.getElementById("ISO").style.display == 'block') {
 		//ISO provided
@@ -163,29 +183,14 @@ function Recalculate(){
 	}
 	
 	//Does the remainder calculations
-	pixelsize=document.getElementById("pixelsize").value/1e6;
-	focaldist=document.getElementById("focaldist").value/1e3;
-	particledist=document.getElementById("particledist").value/1e3;
-	fnumber=document.getElementById("fnumber").value;	
 	lensdist=(focaldist*particledist)/(particledist-focaldist);	
 		
 	
-	Qlaser=document.getElementById("Qlaser").value;
-	t_ns=document.getElementById("time").value;
-	wbeam_mm=document.getElementById("wbeam").value;
-	lbeam_mm=document.getElementById("lbeam").value;
 	Abeam_m2=wbeam_mm*lbeam_mm/1e6;
 	E_laser=Qlaser/((t_ns*1e-9)*Abeam_m2);	
 
-	particleRadius_m=document.getElementById("particleradius").value/1e6;
-	radFlux=Math.PI*particleRadius_m*particleRadius_m*E_laser;	//Energy scattered by the particle (without considering scattering cross section) [W]	
-	particleImageStdPx=document.getElementById("fstd").value;
+	radFlux=Math.PI*particleRadius_m*particleRadius_m*E_laser;	//Energy scattered by the particle (without considering scattering cross section) [W]
 	
-	IOR_Re=document.getElementById("IOR_Re").value;	
-	IOR_Im=document.getElementById("IOR_Im").value;	
-	IOR_Medium=document.getElementById("IOR_Medium").value;	
-	
-	camAngle=document.getElementById("camAngle").value;	
 	
 	updateCanvas();	
 	updateMieScatteringPlot();
